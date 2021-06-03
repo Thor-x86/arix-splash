@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# For giving information what dependencies to be used
+function print_dependecies {
+  echo "Required dependencies:"
+  echo "-> sudo"
+  echo "-> cmake"
+  echo "-> make"
+  echo "-> build-essential (or base-devel on Arch Linux)"
+  echo ""
+}
+
+# Check for development dependencies
+if ! command -v cmake > /dev/null || ! command -v make > /dev/null
+then
+  # Auto install build tools if not exist yet
+  if command -v apt > /dev/null && command -v sudo > /dev/null
+  then
+    # For Debian / Ubuntu:
+    sudo apt update
+    sudo apt install cmake make build-essential -y
+  elif command -v pacman > /dev/null
+  then
+    # For Arch Linux / Manjaro:
+    if command -v sudo > /dev/null
+    then
+      sudo pacman -Sy cmake make base-devel
+    else
+      echo "Sorry, but I can't install dependencies without sudo."
+      print_dependecies
+      exit 1
+    fi
+  elif command -v yum > /dev/null && command -v sudo > /dev/null
+  then
+    # For RHEL:
+    yum groupinstall 'Development Tools' \
+    || echo "Currently maintainers have no experience on RHEL distro, please contribute."; exit 1
+  else
+    # For unsupported Linux distro:
+    echo "I can't help you installing build tools, you have to do it on your own."
+    print_dependecies
+    exit 1
+  fi
+fi
+
+mkdir -p .cmake bin bin-arm64
+cd .cmake
+cmake ..

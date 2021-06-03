@@ -43,6 +43,9 @@ then
   fi
 fi
 
+# Prepare dependencies
+git submodule update --init --recursive
+
 mkdir -p .cmake bin bin-arm64
 cd .cmake
 cmake ..
